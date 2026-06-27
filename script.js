@@ -87,6 +87,39 @@ function init() {
 	window.addEventListener("resize", onWindowResize, false);
 	document.addEventListener("keydown", handleInput);
 
+	let touchStartX = 0;
+let touchStartY = 0;
+
+document.addEventListener("touchstart", (e) => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+});
+
+document.addEventListener("touchend", (e) => {
+    if (!state.isPlaying) return;
+
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const dy = e.changedTouches[0].clientY - touchStartY;
+
+    // Right swipe
+    if (dx > 50 && Math.abs(dx) > Math.abs(dy)) {
+        if (state.lane < 1) state.lane++;
+    }
+
+    // Left swipe
+    if (dx < -50 && Math.abs(dx) > Math.abs(dy)) {
+        if (state.lane > -1) state.lane--;
+    }
+
+    // Up swipe = Jump
+    if (dy < -50 && Math.abs(dy) > Math.abs(dx)) {
+        if (!state.isJumping) {
+            state.isJumping = true;
+            state.jumpVel = CONFIG.jumpPower;
+        }
+    }
+});
+
 	document.getElementById("start-btn").addEventListener("click", startGame);
 	document.getElementById("restart-btn").addEventListener("click", startGame);
 }
